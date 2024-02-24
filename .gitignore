@@ -1,5 +1,6 @@
 media/
 media2/*
+nohup
 
 *.mp4
 *.mkv
