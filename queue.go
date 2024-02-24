@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"sync"
 )
 
@@ -56,10 +58,12 @@ func runQueue(limit int) {
 
 		// Get the next file path from the queue
 		filePath := queue[0]
-		newname := filePath + "AV1.mp4"
+		dirPath := filepath.Dir(filePath) // Get the directory of the original file
+		cleanedName := cleanFileName(filepath.Base(filePath))
+		newname := filepath.Join(dirPath, cleanedName+"-AV1.mp4") // Join the directory path with the new file name
 
 		// Update the queue
-		queue = queue[1:] //if we are gonna plan to store the state of the queue we need to do this here
+		queue = queue[1:]
 
 		ch <- struct{}{} // Block if limit is reached
 		go func(file, newName string) {
@@ -68,6 +72,14 @@ func runQueue(limit int) {
 			err := encodeAv1(file, newName)
 			if err != nil {
 				fmt.Printf("Error encoding file: %v\n", err)
+			} else {
+				// Delete the original file after successful encoding
+				err := os.Remove(file)
+				if err != nil {
+					fmt.Printf("Error deleting file: %v\n", err)
+				} else {
+					fmt.Printf("Deleted original file: %s\n", file)
+				}
 			}
 		}(filePath, newname)
 	}
@@ -77,4 +89,19 @@ func runQueue(limit int) {
 	if len(queue) == 0 {
 		fmt.Println("All tasks completed, queue is empty!")
 	}
+}
+
+func cleanFileName(fileName string) string {
+	// List of words to remove from the file name
+	wordsToRemove := []string{"hevc", "h264", "h.264", "256", "HEVC", "x265"}
+	// Compile a regex that matches any of the words in the list
+	removeRegex := regexp.MustCompile(strings.Join(wordsToRemove, "|"))
+
+	// Remove the words
+	cleanedName := removeRegex.ReplaceAllString(fileName, "")
+
+	// Remove the file extension
+	cleanedName = strings.TrimSuffix(cleanedName, filepath.Ext(cleanedName))
+
+	return cleanedName
 }

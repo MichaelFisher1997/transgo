@@ -7,7 +7,7 @@ import (
 const av1 = "av1"
 
 // func FunctionName(param1 type) this is not typescript you dont use :
-const cat string = "./media/"
+const cat string = "/mnt/MainPool/share/xxx/xxx/"
 
 var queue []string
 
@@ -19,7 +19,7 @@ func main() {
 	for _, filePath := range queue {
 		fmt.Println(filePath)
 	}
-	runQueue(4)
+	runQueue(12)
 }
 
 /*
