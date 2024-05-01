@@ -8,6 +8,21 @@ import (
 	"os/exec"
 )
 
+// Define the struct to match the JSON structure
+type MediaData struct {
+	Streams []struct {
+		Index int `json:"index"`
+		Tags  struct {
+			Language    string `json:"language"`
+			HandlerName string `json:"handler_name"`
+			VendorID    string `json:"vendor_id"`
+		} `json:"tags"`
+	} `json:"streams"`
+	Format struct {
+		Filename string `json:"filename"`
+	} `json:"format"`
+}
+
 func isAv1(probe string) bool {
 	var data map[string]interface{}
 	if err := json.Unmarshal([]byte(probe), &data); err != nil {
@@ -31,8 +46,11 @@ func isAv1(probe string) bool {
 		fmt.Println("Codec name not found or is not a string.")
 		return false
 	}
-
-	fmt.Println("Codec Name:", codecName)
+	filename, _ := getFileName(probe)
+	if filename == "" {
+		fmt.Println("cant get filename for below")
+	}
+	fmt.Println("Codec Name:", codecName+" <- "+filename)
 	return codecName == av1
 }
 
@@ -46,8 +64,16 @@ func getMediaInfo(file string) (string, error) {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("ffprobe error: %w", err)
+		return "", fmt.Errorf("() getMediaInfo : ffprobe error: %w", err)
 	}
-
 	return out.String(), nil
+}
+
+func getFileName(path string) (string, error) {
+	var mediaData MediaData
+	err := json.Unmarshal([]byte(path), &mediaData)
+	if err != nil {
+		return "", err
+	}
+	return mediaData.Format.Filename, nil
 }

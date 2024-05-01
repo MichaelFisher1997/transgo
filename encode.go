@@ -13,7 +13,7 @@ func encodeAv1(file string, newname string) error {
 	// Execute the command
 	err := cmd.Run()
 	if err != nil {
-		//fmt.Printf("FFmpeg error: %v\n", err)
+		// fmt.Printf("FFmpeg error: %v\n", err)
 		return err
 	}
 

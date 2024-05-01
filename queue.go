@@ -35,7 +35,8 @@ func addToQueue(rootPath string) {
 func showIfav1(file string) bool {
 	info, err := getMediaInfo(file)
 	if err != nil {
-		log.Fatalf("Error getting media info: %v", err)
+		log.Printf("Error getting media info: %v", err)
+		return true //it might not be but is it thinks it is then that allows us to skip and not add to que
 	}
 	return isAv1(info)
 }

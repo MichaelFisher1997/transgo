@@ -7,7 +7,7 @@ import (
 const av1 = "av1"
 
 // func FunctionName(param1 type) this is not typescript you dont use :
-const cat string = "/mnt/MainPool/share/xxx/xxx/"
+const cat string = "/mnt/BigNAS/Media/Movies/"
 
 var queue []string
 
